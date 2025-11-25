@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block container %}
+<main>
+    <section id="catLeft">
+        {% for cat in categories %}
+            {% if selectedCategory == cat[0] %}
+                <p class="selectedCategory">{{ cat[1] }}</p>
+            {% else %}
+                <p class="notSelectedCategory">
+                    <a href="{{ url_for('category', categoryId=cat[0]) }}">{{ cat[1] }}</a>
+                </p>
+            {% endif %}
+        {% endfor %}
+    </section>
+
+    <section id="catRight">
+
+        {# --- NO RESULTS MESSAGE --- #}
+        {% if nothingFound %}
+            <p style="color:#dd1d5e; font-weight:bold; margin:20px; font-size:1.2em;">
+                No results found for "{{ searchTerm }}"
+            </p>
+        {% endif %}
+
+        {# --- BOOK RESULTS --- #}
+        {% for book in books %}
+        <div class='book'>
+            <div>
+                <img 
+                    src="{% if book.image is defined %}
+                            {{ url_for('static', filename='images/books/' + book.image) }}
+                         {% else %}
+                            {{ url_for('static', filename='images/books/' + book[6]) }}
+                         {% endif %}"
+                    alt="{% if book.title is defined %}{{ book.title }}{% else %}{{ book[2] }}{% endif %}"
+                >
+            </div>
+
+            <div class='bookDetailBox'>
+                <p class='bookTitle'>
+                    {% if book.title is defined %}
+                        {{ book.title }}
+                    {% else %}
+                        {{ book[2] }}
+                    {% endif %}
+                </p>
+
+                <p class='bookDetail'>
+                    by {% if book.author is defined %}{{ book.author }}{% else %}{{ book[3] }}{% endif %}
+                </p>
+
+                <p class='bookDetail'>
+                    ISBN:
+                    {% if book.isbn is defined %}
+                        {{ book.isbn }}
+                    {% else %}
+                        {{ book[4] }}
+                    {% endif %}
+                </p>
+
+                <p class='bookPrice'>
+                    $
+                    {% if book.price is defined %}
+                        {{ '%.2f'|format(book.price) }}
+                    {% else %}
+                        {{ '%.2f'|format(book[5]) }}
+                    {% endif %}
+                </p>
+
+                <a class='actionButton' href='#'>Add to cart</a>
+
+                {% if (book.readNow is defined and book.readNow == 1)
+                   or (book[7] is defined and book[7] == 1) %}
+                    <a class='actionButton' href='#'>Read Now</a>
+                {% endif %}
+
+                <a class='actionButton' href="{{ url_for('book_detail', book_id=book['id']) }}">
+    Details
+</a>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    </section>
+</main>
+{% endblock %}
+
